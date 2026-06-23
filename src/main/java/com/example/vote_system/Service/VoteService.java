@@ -82,4 +82,23 @@ public class VoteService {
 			optionRepository.save(option);
 		}
 	}
+
+	@Transactional
+	public void delete(Long id) {
+
+		Vote vote = voteRepository.findById(id).orElseThrow();
+
+		List<VoteOption> options = optionRepository.findByVote(vote);
+
+		for (VoteOption option : options) {
+			recordRepository.deleteAllByOption(option);
+			optionRepository.delete(option);
+		}
+
+		voteRepository.delete(vote);
+	}
+
+	public Vote getVoteById(Long voteId) {
+		return voteRepository.findById(voteId).orElseThrow(() -> new RuntimeException("Vote not found"));
+	}
 }

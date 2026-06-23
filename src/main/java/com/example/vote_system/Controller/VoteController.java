@@ -1,6 +1,8 @@
 package com.example.vote_system.Controller;
+
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,16 +19,25 @@ import com.example.vote_system.Service.VoteService;
 @RequestMapping("/api/votes")
 public class VoteController {
 
+	@Autowired
 	private VoteService voteService;
 
 	@GetMapping
-	public List<Vote> getVotes() {
+	public ResponseEntity<List<Vote>> getVotes() {
 
-		return voteService.getAllVotes();
+		return ResponseEntity.ok(voteService.getAllVotes());
+	}
+
+	@GetMapping("/{voteId}")
+	public ResponseEntity<Vote> getVote(@PathVariable("voteId") Long voteId) {
+
+		System.out.println("voteId = " + voteId);
+
+		return ResponseEntity.ok(voteService.getVoteById(voteId));
 	}
 
 	@PostMapping("/{voteId}/vote")
-	public ResponseEntity<?> vote(@PathVariable Long voteId, @RequestBody UserVoteRequest request) {
+	public ResponseEntity<?> vote(@PathVariable("voteId") Long voteId, @RequestBody UserVoteRequest request) {
 
 		voteService.vote(voteId, request);
 

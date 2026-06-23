@@ -1,5 +1,7 @@
 package com.example.vote_system.Entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -23,6 +25,7 @@ public class VoteOption {
 	@Column(name = "total_count")
 	private Integer totalCount = 0;
 
+	@JsonIgnore
 	@ManyToOne
 	@JoinColumn(name = "vote_id")
 	private Vote vote;
