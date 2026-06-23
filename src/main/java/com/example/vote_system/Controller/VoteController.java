@@ -9,9 +9,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.vote_system.Entity.Vote;
+import com.example.vote_system.Repositary.VoteRecordRepository;
 import com.example.vote_system.Request.UserVoteRequest;
 import com.example.vote_system.Service.VoteService;
 
@@ -21,6 +23,9 @@ public class VoteController {
 
 	@Autowired
 	private VoteService voteService;
+
+	@Autowired
+	private VoteRecordRepository recordRepository;
 
 	@GetMapping
 	public ResponseEntity<List<Vote>> getVotes() {
@@ -42,5 +47,10 @@ public class VoteController {
 		voteService.vote(voteId, request);
 
 		return ResponseEntity.ok().build();
+	}
+
+	@GetMapping("/{voteId}/has-voted")
+	public ResponseEntity<Boolean> hasVoted(@PathVariable("voteId") Long voteId, @RequestParam("userId") Long userId) {
+		return ResponseEntity.ok(recordRepository.existsByUser_IdAndVote_Id(userId, voteId));
 	}
 }

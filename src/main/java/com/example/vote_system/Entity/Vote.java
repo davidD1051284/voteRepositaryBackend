@@ -18,7 +18,7 @@ public class Vote {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long voteId;
+	private Long id;
 
 	@Column(name = "vote_name")
 	private String voteName;
@@ -29,12 +29,12 @@ public class Vote {
 	@OneToMany(mappedBy = "vote", fetch = FetchType.EAGER)
 	private java.util.List<VoteOption> options;
 
-	public Long getVoteId() {
-		return voteId;
+	public Long getId() {
+		return id;
 	}
 
-	public void setVoteId(Long voteId) {
-		this.voteId = voteId;
+	public void setId(Long id) {
+		this.id = id;
 	}
 
 	public String getVoteName() {
@@ -68,7 +68,7 @@ public class Vote {
 
 	public Vote(Long voteId, String voteName, LocalDateTime createTime, List<VoteOption> options) {
 		super();
-		this.voteId = voteId;
+		this.id = voteId;
 		this.voteName = voteName;
 		this.createTime = createTime;
 		this.options = options;

@@ -17,6 +17,7 @@ public class VoteOption {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "option_id")
 	private Long optionId;
 
 	@Column(name = "option_name")

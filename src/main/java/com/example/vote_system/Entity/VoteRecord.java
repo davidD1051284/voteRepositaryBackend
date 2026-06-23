@@ -1,7 +1,6 @@
 package com.example.vote_system.Entity;
 
-import java.time.LocalDateTime;
-
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -16,19 +15,16 @@ public class VoteRecord {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "record_id")
 	private Long recordId;
 
-	private Long userId;
-
-	private LocalDateTime voteTime;
+	@ManyToOne
+	@JoinColumn(name = "user_id")
+	private User user;
 
 	@ManyToOne
 	@JoinColumn(name = "vote_id")
 	private Vote vote;
-
-	@ManyToOne
-	@JoinColumn(name = "option_id")
-	private VoteOption option;
 
 	public Long getRecordId() {
 		return recordId;
@@ -38,20 +34,12 @@ public class VoteRecord {
 		this.recordId = recordId;
 	}
 
-	public Long getUserId() {
-		return userId;
+	public User getUser() {
+		return user;
 	}
 
-	public void setUserId(Long userId) {
-		this.userId = userId;
-	}
-
-	public LocalDateTime getVoteTime() {
-		return voteTime;
-	}
-
-	public void setVoteTime(LocalDateTime voteTime) {
-		this.voteTime = voteTime;
+	public void setUser(User user) {
+		this.user = user;
 	}
 
 	public Vote getVote() {
@@ -62,26 +50,16 @@ public class VoteRecord {
 		this.vote = vote;
 	}
 
-	public VoteOption getOption() {
-		return option;
-	}
-
-	public void setOption(VoteOption option) {
-		this.option = option;
-	}
-
 	public VoteRecord() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
 
-	public VoteRecord(Long recordId, Long userId, LocalDateTime voteTime, Vote vote, VoteOption option) {
+	public VoteRecord(Long recordId, User user, Vote vote) {
 		super();
 		this.recordId = recordId;
-		this.userId = userId;
-		this.voteTime = voteTime;
+		this.user = user;
 		this.vote = vote;
-		this.option = option;
 	}
 
 }

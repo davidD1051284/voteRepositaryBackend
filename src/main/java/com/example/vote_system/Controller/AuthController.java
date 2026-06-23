@@ -14,22 +14,40 @@ import com.example.vote_system.Repositary.UserRepository;
 @RequestMapping("/api/auth")
 public class AuthController {
 
-    @Autowired
-    private UserRepository userRepository;
+	@Autowired
+	private UserRepository userRepository;
 
-    @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody User req) {
+	@PostMapping("/login")
+	public ResponseEntity<?> login(@RequestBody User req) {
 
-        User user = userRepository.findByUsername(req.getUsername());
+		User user = userRepository.findByUsername(req.getUsername());
 
-        if (user == null) {
-            return ResponseEntity.status(401).body("帳號不存在");
-        }
+		if (user == null) {
+			return ResponseEntity.status(401).body("帳號不存在");
+		}
 
-        if (!user.getPassword().equals(req.getPassword())) {
-            return ResponseEntity.status(401).body("密碼錯誤");
-        }
+		if (!user.getPassword().equals(req.getPassword())) {
+			return ResponseEntity.status(401).body("密碼錯誤");
+		}
+		
+		if (!user.getRole().equals(req.getRole())) {
+			return ResponseEntity.status(401).body("身分錯誤");
+		}
 
-        return ResponseEntity.ok(user);
-    }
+		return ResponseEntity.ok(user);
+	}
+
+	@PostMapping("/register")
+	public ResponseEntity<?> register(@RequestBody User req) {
+
+		User user = userRepository.findByUsername(req.getUsername());
+
+		if (user != null) {
+			return ResponseEntity.badRequest().body("該帳號已存在");
+		}
+
+		userRepository.save(req);
+
+		return ResponseEntity.ok("註冊成功");
+	}
 }

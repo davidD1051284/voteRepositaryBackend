@@ -2,14 +2,19 @@ package com.example.vote_system.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.example.vote_system.Entity.User;
 import com.example.vote_system.Entity.Vote;
 import com.example.vote_system.Entity.VoteOption;
 import com.example.vote_system.Entity.VoteRecord;
+import com.example.vote_system.Entity.VoteRecordOption;
+import com.example.vote_system.Repositary.UserRepository;
 import com.example.vote_system.Repositary.VoteOptionRepository;
+import com.example.vote_system.Repositary.VoteRecordOptionRepository;
 import com.example.vote_system.Repositary.VoteRecordRepository;
 import com.example.vote_system.Repositary.VoteRepository;
 import com.example.vote_system.Request.UserVoteRequest;
@@ -28,6 +33,12 @@ public class VoteService {
 
 	@Autowired
 	private VoteRecordRepository recordRepository;
+
+	@Autowired
+	private VoteRecordOptionRepository voteRecordOptionRepository;
+
+	@Autowired
+	private UserRepository userRepositary;
 
 	public List<Vote> getAllVotes() {
 		return voteRepository.findAll();
@@ -59,42 +70,67 @@ public class VoteService {
 	@Transactional
 	public void vote(Long voteId, UserVoteRequest request) {
 
-		Vote vote = voteRepository.findById(voteId).orElseThrow();
+		// 1️⃣ 查 vote
+		Vote vote = voteRepository.findById(voteId).orElseThrow(() -> new RuntimeException("Vote not found"));
 
+		// 1️⃣ 防止重複投票（重要）
+		boolean exists = recordRepository.existsByUser_IdAndVote_Id(request.getUserId(), voteId);
+
+		if (exists) {
+			throw new RuntimeException("你已經投過票了");
+		}
+
+		// 2️⃣ 建立一筆投票紀錄（ONLY ONCE）
+		VoteRecord record = new VoteRecord();
+		User user = userRepositary.findById(request.getUserId())
+				.orElseThrow(() -> new RuntimeException("User not found"));
+
+		record.setUser(user);
+		record.setVote(vote);
+
+		recordRepository.save(record);
+
+		// 3️⃣ 多選 option 存到 VoteRecordOption
 		for (Long optionId : request.getOptionIds()) {
 
-			VoteOption option = optionRepository.findById(optionId).orElseThrow();
+			VoteOption option = optionRepository.findById(optionId)
+					.orElseThrow(() -> new RuntimeException("Option not found"));
 
-			VoteRecord record = new VoteRecord();
+			option.setTotalCount(Optional.ofNullable(option.getTotalCount()).orElse(0) + 1);
 
-			record.setUserId(request.getUserId());
+			VoteRecordOption recordOption = new VoteRecordOption();
 
-			record.setVote(vote);
+			recordOption.setVoteRecord(record);
+			recordOption.setOption(option);
 
-			record.setOption(option);
-
-			record.setVoteTime(LocalDateTime.now());
-
-			recordRepository.save(record);
-
-			option.setTotalCount(option.getTotalCount() + 1);
-
-			optionRepository.save(option);
+			voteRecordOptionRepository.save(recordOption);
 		}
 	}
 
 	@Transactional
-	public void delete(Long id) {
+	public void delete(Long voteId) {
 
-		Vote vote = voteRepository.findById(id).orElseThrow();
+		// 1️⃣ 找 vote
+		Vote vote = voteRepository.findById(voteId).orElseThrow(() -> new RuntimeException("Vote not found"));
 
-		List<VoteOption> options = optionRepository.findByVote(vote);
+		// 2️⃣ 找所有 voteRecord
+		List<VoteRecord> records = recordRepository.findAllByVote_Id(voteId);
 
-		for (VoteOption option : options) {
-			recordRepository.deleteAllByOption(option);
-			optionRepository.delete(option);
+		for (VoteRecord record : records) {
+
+			// 3️⃣ 刪 record_option
+			voteRecordOptionRepository.deleteAllByVoteRecordRecordId(record.getRecordId());
+
+			// 4️⃣ 刪 record
+			recordRepository.delete(record);
 		}
 
+		// 5️⃣ 刪 vote_option
+		List<VoteOption> options = optionRepository.findByVote(vote);
+
+		optionRepository.deleteAll(options);
+
+		// 6️⃣ 最後刪 vote
 		voteRepository.delete(vote);
 	}
 
