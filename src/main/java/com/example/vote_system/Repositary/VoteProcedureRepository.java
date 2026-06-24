@@ -119,23 +119,24 @@ public class VoteProcedureRepository {
 		return votes.get(0);
 	}
 
-	public Long createVoteRecord(Long userId, Long voteId) {
+	public Long createVoteRecord(Long userId, Long voteId, String userName) {
 
-		StoredProcedureQuery query = em.createStoredProcedureQuery("sp_create_vote_record");
+		StoredProcedureQuery query = em.createStoredProcedureQuery("sp_vote");
 
 		query.registerStoredProcedureParameter("p_user_id", Long.class, ParameterMode.IN);
-
 		query.registerStoredProcedureParameter("p_vote_id", Long.class, ParameterMode.IN);
-
-		query.registerStoredProcedureParameter("p_record_id", Long.class, ParameterMode.OUT);
+		query.registerStoredProcedureParameter("p_user_name", String.class, ParameterMode.IN);
 
 		query.setParameter("p_user_id", userId);
-
 		query.setParameter("p_vote_id", voteId);
+		query.setParameter("p_user_name", userName);
 
 		query.execute();
 
-		return ((Number) query.getOutputParameterValue("p_record_id")).longValue();
+		// 取 SELECT LAST_INSERT_ID()
+		Object result = query.getSingleResult();
+
+		return ((Number) result).longValue();
 	}
 
 	public void voteOption(Long recordId, Long optionId) {

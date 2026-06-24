@@ -26,6 +26,9 @@ public class VoteRecord {
 	@JoinColumn(name = "vote_id")
 	private Vote vote;
 
+	@Column(name = "user_name")
+	private String userName;
+
 	public Long getRecordId() {
 		return recordId;
 	}
@@ -50,16 +53,25 @@ public class VoteRecord {
 		this.vote = vote;
 	}
 
+	public String getUserName() {
+		return userName;
+	}
+
+	public void setUserName(String userName) {
+		this.userName = userName;
+	}
+
 	public VoteRecord() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
 
-	public VoteRecord(Long recordId, User user, Vote vote) {
+	public VoteRecord(Long recordId, User user, Vote vote, String userName) {
 		super();
 		this.recordId = recordId;
 		this.user = user;
 		this.vote = vote;
+		this.userName = userName;
 	}
 
 }

@@ -41,7 +41,7 @@ public class VoteService {
 			throw new RuntimeException("你已經投過票了");
 		}
 
-		Long recordId = voteProcedureRepository.createVoteRecord(request.getUserId(), voteId);
+		Long recordId = voteProcedureRepository.createVoteRecord(request.getUserId(), voteId, request.getUserName());
 
 		for (Long optionId : request.getOptionIds()) {
 

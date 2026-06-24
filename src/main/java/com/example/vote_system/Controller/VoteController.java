@@ -38,7 +38,7 @@ public class VoteController {
 	}
 
 	@PostMapping("/{voteId}/vote")
-	public ResponseEntity<?> vote(@PathVariable Long voteId, @RequestBody UserVoteRequest request) {
+	public ResponseEntity<?> vote(@PathVariable("voteId") Long voteId, @RequestBody UserVoteRequest request) {
 
 		voteService.vote(voteId, request);
 		return ResponseEntity.ok().build();
