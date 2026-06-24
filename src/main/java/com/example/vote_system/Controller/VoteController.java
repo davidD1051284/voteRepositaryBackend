@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.vote_system.Entity.Vote;
-import com.example.vote_system.Repositary.VoteRecordRepository;
+import com.example.vote_system.Repositary.VoteProcedureRepository;
 import com.example.vote_system.Request.UserVoteRequest;
 import com.example.vote_system.Service.VoteService;
 
@@ -25,32 +25,29 @@ public class VoteController {
 	private VoteService voteService;
 
 	@Autowired
-	private VoteRecordRepository recordRepository;
+	private VoteProcedureRepository voteProcedureRepository;
 
 	@GetMapping
 	public ResponseEntity<List<Vote>> getVotes() {
-
 		return ResponseEntity.ok(voteService.getAllVotes());
 	}
 
 	@GetMapping("/{voteId}")
 	public ResponseEntity<Vote> getVote(@PathVariable("voteId") Long voteId) {
-
-		System.out.println("voteId = " + voteId);
-
 		return ResponseEntity.ok(voteService.getVoteById(voteId));
 	}
 
 	@PostMapping("/{voteId}/vote")
-	public ResponseEntity<?> vote(@PathVariable("voteId") Long voteId, @RequestBody UserVoteRequest request) {
+	public ResponseEntity<?> vote(@PathVariable Long voteId, @RequestBody UserVoteRequest request) {
 
 		voteService.vote(voteId, request);
-
 		return ResponseEntity.ok().build();
 	}
 
 	@GetMapping("/{voteId}/has-voted")
 	public ResponseEntity<Boolean> hasVoted(@PathVariable("voteId") Long voteId, @RequestParam("userId") Long userId) {
-		return ResponseEntity.ok(recordRepository.existsByUser_IdAndVote_Id(userId, voteId));
+
+		return ResponseEntity.ok(voteProcedureRepository.hasVoted(userId, voteId));
 	}
+
 }
