@@ -1,10 +1,10 @@
 INSERT INTO users (username, password, role)
 VALUES
 ('admin', '123456', 'admin'),
-('alice', '123456', 'user'),
-('bob', '123456', 'user'),
-('cindy', '123456', 'user'),
-('david', '123456', 'user');
+('alice', '123456', 'visitor'),
+('bob', '123456', 'visitor'),
+('cindy', '123456', 'visitor'),
+('david', '123456', 'visitor');
 
 INSERT INTO vote (vote_name, create_time)
 VALUES
@@ -14,7 +14,8 @@ VALUES
 
 
 INSERT INTO vote_option (option_name, total_count, vote_id)
-VALUES
+VALUES 
+--vote_id 是AI所以可能會有不同
 -- vote 1
 ('Java', 0, 1),
 ('Python', 0, 1),
